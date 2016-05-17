@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package spring.support.amqp.rabbit;
 
@@ -11,6 +11,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.UUID;
 
 import spring.support.amqp.rabbit.repository.MutexRepository;
 
@@ -43,7 +45,7 @@ public class ExactlyOnceDeliveryProducer {
 
   /**
    * トランザクション完了後メッセージを送信する.
-   * 
+   *
    * @param exchange
    * @param routingKey
    * @param payload
@@ -54,7 +56,7 @@ public class ExactlyOnceDeliveryProducer {
 
   /**
    * トランザクション完了後メッセージを送信する.
-   * 
+   *
    * @param exchange
    * @param routingKey
    * @param payload
@@ -66,6 +68,11 @@ public class ExactlyOnceDeliveryProducer {
     MessageProperties properties = new MessageProperties();
     properties.getHeaders().put(MUTEX, mutex);
     Message message = template.getMessageConverter().toMessage(payload, properties);
+    MessageProperties messageProperties = message.getMessageProperties();
+    if (messageProperties.getMessageId() == null) {
+      String id = UUID.randomUUID().toString();
+      messageProperties.setMessageId(id);
+    }
 
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       String savingMessage = new String(message.getBody());
