@@ -2,7 +2,6 @@
 
 クラスタ + ミラーキュー
 
-![rabbit.png](https://qiita-image-store.s3.amazonaws.com/0/39230/4821437a-8334-0085-7781-57c08b691a86.png "rabbit.png")
 
 
 # 2重配信制御
