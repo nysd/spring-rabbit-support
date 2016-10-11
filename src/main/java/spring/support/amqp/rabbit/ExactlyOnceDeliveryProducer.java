@@ -49,7 +49,21 @@ public class ExactlyOnceDeliveryProducer {
    * @param payload
    */
   public String send(String exchange, String routingKey, Object payload) {
-    return send(exchange, routingKey, payload, handler);
+    return send(exchange, routingKey, payload, null, handler);
+  }
+
+
+  /**
+   * トランザクション完了後メッセージを送信する.
+   * 
+   * @param exchange
+   * @param routingKey
+   * @param payload
+   * @param properties
+   */
+  public String send(String exchange, String routingKey, Object payload,
+      MessageProperties properties) {
+    return send(exchange, routingKey, payload, properties, handler);
   }
 
   /**
@@ -60,10 +74,12 @@ public class ExactlyOnceDeliveryProducer {
    * @param payload
    * @param handler
    */
-  public String send(String exchange, String routingKey, Object payload, ErrorHandler handler) {
+  public String send(String exchange, String routingKey, Object payload,
+      MessageProperties originProperties, ErrorHandler handler) {
 
     String mutex = repository.create();
-    MessageProperties properties = new MessageProperties();
+    MessageProperties properties =
+        originProperties == null ? new MessageProperties() : originProperties;
     properties.getHeaders().put(MUTEX, mutex);
     Message message = template.getMessageConverter().toMessage(payload, properties);
 
