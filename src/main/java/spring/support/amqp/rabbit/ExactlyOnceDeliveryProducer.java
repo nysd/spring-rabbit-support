@@ -3,6 +3,8 @@
  */
 package spring.support.amqp.rabbit;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -81,6 +83,9 @@ public class ExactlyOnceDeliveryProducer {
     MessageProperties properties =
         originProperties == null ? new MessageProperties() : originProperties;
     properties.getHeaders().put(MUTEX, mutex);
+    if (properties.getMessageId() == null) {
+      properties.setMessageId(UUID.randomUUID().toString());
+    }
     Message message = template.getMessageConverter().toMessage(payload, properties);
 
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
